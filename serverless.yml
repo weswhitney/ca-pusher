@@ -1,0 +1,12 @@
+service: ca-pusher
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  profile: default
+
+functions:
+  push:
+    handler: handler.run
