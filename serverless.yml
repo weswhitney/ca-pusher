@@ -2,6 +2,9 @@ service: ca-pusher
 
 frameworkVersion: "3"
 
+plugins:
+  - serverless-plugin-typescript
+
 provider:
   name: aws
   runtime: nodejs14.x
