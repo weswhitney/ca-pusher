@@ -2,10 +2,6 @@ import AWS from "aws-sdk"
 
 const region = process.env.AWS_REGION
 
-const title = "Test message sent from Amazon Pinpoint."
-
-// const message = "This is a sample message sent from Amazon Pinpoint by using the " + "AWS SDK for JavaScript in Node.js"
-
 const applicationId = process.env.APP_ID
 
 const recipient = {
@@ -23,7 +19,7 @@ const ttl = 30
 
 const silent = false
 
-function CreateMessageRequest(msg: any) {
+function CreateMessageRequest(msg: any, sub: any) {
   const token: any = recipient["token"]
   const service = recipient["service"]
   let messageRequest
@@ -40,7 +36,7 @@ function CreateMessageRequest(msg: any) {
           Body: msg,
           Priority: priority,
           SilentPush: silent,
-          Title: title,
+          Title: sub,
           TimeToLive: ttl,
           Url: url,
         },
@@ -59,7 +55,7 @@ function CreateMessageRequest(msg: any) {
           Body: msg,
           Priority: priority,
           SilentPush: silent,
-          Title: title,
+          Title: sub,
           TimeToLive: ttl,
           Url: url,
         },
@@ -84,10 +80,10 @@ function ShowOutput(data: any) {
   console.dir(data, { depth: null })
 }
 
-export default function SendMessage(msg: any) {
+export default function SendMessage(msg: any, sub: any) {
   const token = recipient["token"]
   const service = recipient["service"]
-  const messageRequest = CreateMessageRequest(msg)
+  const messageRequest = CreateMessageRequest(msg, sub)
 
   // Specify that you're using a shared credentials file, and specify the
   // IAM profile to use.

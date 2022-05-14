@@ -6,7 +6,8 @@ module.exports.run = async (event: any, _context: any, _callback: any) => {
   console.log("env ", process.env)
   console.log("Received event:", JSON.stringify(event, null, 4))
 
-  var message = event.Records[0].Sns.Message
+  const message = event.Records[0].Sns.Message
+  const subject = event.Records[0].Sns.subject
   console.log("Message received from SNS:", message)
-  sendMessage(message)
+  sendMessage(message, subject)
 }
