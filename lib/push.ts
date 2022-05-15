@@ -1,5 +1,4 @@
 import AWS from "aws-sdk"
-
 const region = process.env.AWS_REGION
 
 const applicationId = process.env.APP_ID
@@ -19,7 +18,7 @@ const ttl = 30
 
 const silent = false
 
-function CreateMessageRequest(msg: any, sub: any) {
+function CreateMessageRequest(snsEvent: any) {
   const token: any = recipient["token"]
   const service = recipient["service"]
   let messageRequest
@@ -33,10 +32,10 @@ function CreateMessageRequest(msg: any, sub: any) {
       MessageConfiguration: {
         GCMMessage: {
           Action: action,
-          Body: msg,
+          Body: snsEvent.Records[0].Sns.Message,
           Priority: priority,
           SilentPush: silent,
-          Title: sub,
+          Title: snsEvent.Records[0].Sns.Subject,
           TimeToLive: ttl,
           Url: url,
         },
@@ -52,10 +51,10 @@ function CreateMessageRequest(msg: any, sub: any) {
       MessageConfiguration: {
         APNSMessage: {
           Action: action,
-          Body: msg,
+          Body: snsEvent.Records[0].Sns.Message,
           Priority: priority,
           SilentPush: silent,
-          Title: sub,
+          Title: snsEvent.Records[0].Sns.Subject,
           TimeToLive: ttl,
           Url: url,
         },
@@ -80,11 +79,10 @@ function ShowOutput(data: any) {
   console.dir(data, { depth: null })
 }
 
-export default function SendMessage(msg: any, sub: any) {
+export function sendMessage(evt: any) {
   const token = recipient["token"]
   const service = recipient["service"]
-  const messageRequest = CreateMessageRequest(msg, sub)
-
+  const messageRequest = CreateMessageRequest(evt)
   // Specify that you're using a shared credentials file, and specify the
   // IAM profile to use.
 
@@ -102,7 +100,6 @@ export default function SendMessage(msg: any, sub: any) {
     ApplicationId: applicationId,
     MessageRequest: messageRequest,
   }
-
   // @ts-ignore
   pinpoint.sendMessages(params, function (err, data) {
     if (err) console.log("error in send message", err)
