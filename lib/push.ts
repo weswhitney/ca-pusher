@@ -80,8 +80,6 @@ function ShowOutput(data: any) {
 }
 
 export async function sendMessage(evt: any) {
-  const token = recipient["token"]
-  const service = recipient["service"]
   // Specify that you're using a shared credentials file, and specify the
   // IAM profile to use.
 
@@ -97,7 +95,7 @@ export async function sendMessage(evt: any) {
   const pinpoint = new AWS.Pinpoint()
   const userParams = {
     ApplicationId: applicationId,
-    UserId: "123456789",
+    UserId: process.env.USER_ID,
   }
   const endpoints = await pinpoint
     // @ts-ignore
@@ -105,9 +103,9 @@ export async function sendMessage(evt: any) {
     .promise()
     .catch(console.log)
   //@ts-ignore
-  console.log(endpoints.EndpointsResponse.Item[0])
+  // console.log(endpoints.EndpointsResponse.Item[0])
   //@ts-ignore
-  const endpoint = endpoints.EndpointsResponse.Item[0]
+  const endpoint = await endpoints.EndpointsResponse.Item[0]
   const messageRequest = CreateMessageRequest(evt, endpoint)
 
   const params = {
