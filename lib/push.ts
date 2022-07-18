@@ -4,7 +4,7 @@ const region = process.env.AWS_REGION
 const applicationId = process.env.APP_ID
 
 const recipient = {
-  token: process.env.TOKEN,
+  token: process.env.TOKEN_MYPHONE,
   service: "APNS",
 }
 
@@ -18,9 +18,9 @@ const ttl = 30
 
 const silent = false
 
-function CreateMessageRequest(snsEvent: any) {
-  const token: any = recipient["token"]
-  const service = recipient["service"]
+function CreateMessageRequest(snsEvent: any, endpoint: any) {
+  const token: any = endpoint.Address
+  const service = endpoint.ChannelType
   let messageRequest
   if (service == "GCM") {
     messageRequest = {
@@ -79,10 +79,7 @@ function ShowOutput(data: any) {
   console.dir(data, { depth: null })
 }
 
-export function sendMessage(evt: any) {
-  const token = recipient["token"]
-  const service = recipient["service"]
-  const messageRequest = CreateMessageRequest(evt)
+export async function sendMessage(evt: any) {
   // Specify that you're using a shared credentials file, and specify the
   // IAM profile to use.
 
@@ -96,10 +93,26 @@ export function sendMessage(evt: any) {
   AWS.config.update({ region: region })
 
   const pinpoint = new AWS.Pinpoint()
+  const userParams = {
+    ApplicationId: applicationId,
+    UserId: process.env.USER_ID,
+  }
+  const endpoints = await pinpoint
+    // @ts-ignore
+    .getUserEndpoints(userParams)
+    .promise()
+    .catch(console.log)
+  //@ts-ignore
+  // console.log(endpoints.EndpointsResponse.Item[0])
+  //@ts-ignore
+  const endpoint = await endpoints.EndpointsResponse.Item[0]
+  const messageRequest = CreateMessageRequest(evt, endpoint)
+
   const params = {
     ApplicationId: applicationId,
     MessageRequest: messageRequest,
   }
+
   // @ts-ignore
   pinpoint.sendMessages(params, function (err, data) {
     if (err) console.log("error in send message", err)
